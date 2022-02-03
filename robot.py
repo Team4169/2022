@@ -44,22 +44,28 @@ class MyRobot(wpilib.TimedRobot):
         print("Starting teleop...")
 
     def teleopPeriodic(self):
-        print("The drive X value is: ", self.controller.getX(
-            self.controller.Hand.kLeftHand))
-        print("The drive Y value is: ", self.controller.getY(
-            self.controller.Hand.kLeftHand))
-        print("The gyro Yaw value is: ", self.gyro.getYaw())
-        self.sd.putValue("Gyro Yaw", self.gyro.getYaw())
-        self.sd.putValue("Left Encoder Value",
-                         self.front_left_motor.getSelectedSonsorPosition())
-        self.sd.putValue("Right Encoder Value",
-                         self.front_right_motor.getSelectedSensorPosition())
-        self.drive.arcadeDrive(
-        	self.controller.getX(self.controller.Hand.kLeftHand),
-        	self.controller.getY(self.controller.Hand.kLeftHand),
-        	True
-        )
-
+        # print("The drive X value is: ", self.controller.getX(
+        #     self.controller.Hand.kLeftHand))
+        # print("The drive Y value is: ", self.controller.getY(
+        #     self.controller.Hand.kLeftHand))
+        # print("The gyro Yaw value is: ", self.gyro.getYaw())
+        # self.sd.putValue("Gyro Yaw", self.gyro.getYaw())
+        # self.sd.putValue("Left Encoder Value",
+        #                  self.front_left_motor.getSelectedSonsorPosition())
+        # self.sd.putValue("Right Encoder Value",
+        #                  self.front_right_motor.getSelectedSensorPosition())
+        # self.drive.arcadeDrive(
+        # 	self.controller.getX(self.controller.Hand.kLeftHand),
+        # 	self.controller.getY(self.controller.Hand.kLeftHand),
+        # 	True
+        # )
+        limelight = NetworkTables.getTable("limelight")
+        print(limelight)
+        print("tx: ", limelight.getNumber("tx", 0))
+        print("ty: ", limelight.getNumber("ty", 0))
+        print("ta: ", limelight.getNumber("ta", 0))
+        print("ts: ", limelight.getNumber("ts", 0))
+        print("____________________________")
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
