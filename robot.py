@@ -61,6 +61,7 @@ class MyRobot(wpilib.TimedRobot):
         # )
         limelight = NetworkTables.getTable("limelight")
         print(limelight)
+        print("tv: ", limelight.getNumber("tv", 0))
         print("tx: ", limelight.getNumber("tx", 0))
         print("ty: ", limelight.getNumber("ty", 0))
         print("ta: ", limelight.getNumber("ta", 0))
