@@ -1,21 +1,32 @@
 import wpilib
-import wpilib.drive
+from wpilib.drive import DifferentialDrive
 import ctre
 from constants import constants
 from networktables import NetworkTables
 import navx
 
+
+
 class MyRobot(wpilib.TimedRobot):
+    """This is a demo program showing how to use Gyro control with the
+    DifferentialDrive class."""
+
     def robotInit(self):
+        """Robot initialization function"""
+        # smart dashboard
+        self.sd = NetworkTables.getTable("SmartDashboard")
+        # gyro calibration constant, may need to be adjusted
+        # gyro value of 360 is set to correspond to one full revolution
+
+        # self.voltsPerDegreePerSecond = 0.0128
+
         self.front_left_motor = ctre.WPI_TalonSRX(constants["frontLeftPort"])
         self.rear_left_motor = ctre.WPI_VictorSPX(constants["rearLeftPort"])
-        self.rear_left_motor.setInverted(True)
         self.left = wpilib.SpeedControllerGroup(
             self.front_left_motor, self.rear_left_motor)
 
-        self.front_right_motor = ctre.WPI_TalonSRX(constants["frontRightPort"])
-        self.rear_right_motor = ctre.WPI_VictorSPX(constants["rearRightPort"])
-        self.rear_right_motor.setInverted(True)
+        self.rear_right_motor = ctre.WPI_TalonSRX(constants["rearRightPort"])
+        self.front_right_motor = ctre.WPI_VictorSPX(constants["frontRightPort"])
         self.right = wpilib.SpeedControllerGroup(
             self.front_right_motor, self.rear_right_motor)
 
@@ -24,43 +35,130 @@ class MyRobot(wpilib.TimedRobot):
             self.left
         )
 
+        self.front_left_motor.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
         self.controller = wpilib.XboxController(0)
         self.timer = wpilib.Timer()
         self.sd = NetworkTables.getTable("SmartDashboard")
-        self.gyro = navx.AHRS.create_i2c()
-        self.front_left_motor.configSelectedFeedbackSensor(
-            ctre.FeedbackDevice.QuadEncoder, 0, 0)
-        self.front_right_motor.configSelectedFeedbackSensor(
-            ctre.FeedbackDevice.QuadEncoder, 0, 0)
-
-    def autnomousInit(self):
-        self.timer.reset()
-        self.timer.start()
-
-    def autonomousPeriodic(self):
-        print("Time: ", self.timer.get())
+        self.gyro = navx.AHRS.create_i2c(wpilib.I2C.Port.kMXP)
+        #change to negative if necessary
+        self.tpf = 924
+        self.max_speed = 0.4
 
     def teleopInit(self):
-        print("Starting teleop...")
+        """
+        Runs at the beginning of the teleop period
+        """
+        self.gyro.reset()
+        self.front_left_motor.setSelectedSensorPosition(0, 0, 10)
+        # self.gyro.setSensitivity(
+        # self.voltsPerDegreePerSecond
+        # )  # calibrates gyro values to equal degrees
+        self.pGain = self.sd.getValue("PGain", 0.032)
+        self.kP = self.sd.getValue("kP", 0.05)
+        self.steps = [{
+            "Step_Type": "Straight",
+            "Distance": 3,
+            "Angle": 0,
+            "Threshold_Value": .1,
+            "Threshold_Time": 1,
+        },{
+            "Step_Type": "Turn",
+            "Distance": 0,
+            "Angle": 90,
+            "Threshold_Value": 1,
+            "Threshold_Time": 1,
+        },{
+            "Step_Type": "Straight",
+            "Distance": 3,
+            "Angle": 90,
+            "Threshold_Value": .1,
+            "Threshold_Time": 1,
+        },{
+            "Step_Type": "Turn",
+            "Distance": 0,
+            "Angle": 90,
+            "Threshold_Value": 1,
+            "Threshold_Time": 1,
+        },
+        ]
+        self.current_step_index = 0
+        self.current_step = self.steps[self.current_step_index]
+        self.in_threshold_time = 0
+        self.in_threshold_start_time = 0
+        self.in_threshold = False
 
     def teleopPeriodic(self):
-        print("The drive X value is: ", self.controller.getX(
-            self.controller.Hand.kLeftHand))
-        print("The drive Y value is: ", self.controller.getY(
-            self.controller.Hand.kLeftHand))
-        print("The gyro Yaw value is: ", self.gyro.getYaw())
+        self.isAPressed = self.controller.getAButton()
+        self.isBPressed = self.controller.getBButton()
+        self.isXPressed = self.controller.getXButton()
+        self.isYPressed = self.controller.getYButton()
+        if self.in_threshold:
+            self.in_threshold_time = self.timer.get() - self.in_threshold_start_time
+        else:
+            self.in_threshold_time = 0
+        #check threshold
+        if self.isBPressed:
+            #Determine if in threshold
+            if self.current_step['Step_Type'] == "Straight":
+                current_in_threshold = abs(self.goal_tick_dist - self.front_left_motor.getSelectedSensorPosition()) < self.current_step[
+                    'Threshold_Value']
+            elif self.current_step['Step_Type'] == "Turn":
+                current_in_threshold = self.goal_angle - self.gyro.getYaw() < self.current_step['Threshold_Value']
+
+            if current_in_threshold:
+                if self.in_threshold == False:
+                    #Just entered the threshold
+                    self.in_threshold = True
+                    self.in_thershold_start_time = self.timer.get()
+                if self.in_threshold_time > self.current_step['Threshold_Time']:
+                    #Been in threshold for a good amount of time, move to next step
+                    self.current_step_index += 1
+                    self.current_step = self.steps[self.current_step_index]
+                    self.front_left_motor.setSelectedSensorPosition(0, 0, 10)
+                    self.in_threshold = False
+            else:
+                self.in_threshold = False
+
+        #Setting Speed
+        if self.current_step['Step_Type'] == "Straight":
+            self.goal_tick_dist = self.current_step['Distance'] * self.tpf
+            self.distance_error = self.goal_tick_dist - self.front_left_motor.getSelectedSensorPosition()
+            self.speed = self.distance_error * self.kP
+            if self.speed > self.max_speed:
+                self.speed = self.max_speed
+            if self.speed < self.max_speed * -1:
+                self.speed = -1 * self.max_speed
+        elif self.current_step['Step_Type'] == "Turn":
+            self.speed = 0 # we don't want to move forward when turning (turn in place)
+
+        #Setting Angle - this drives helps drive
+        self.goal_angle = self.current_step['Angle']
+        turningValue = (self.goal_angle - self.gyro.getYaw()) * self.pGain
+
+        #move the robot
+        self.drive.arcadeDrive(self.speed, turningValue)
+
+        #print debug values
+
+        self.sd.putValue("IsBPressed", self.isBPressed)
+        self.sd.putValue("current_step_index", self.current_step_index)
+        self.sd.putValue("Step Type", self.current_step['Step_Type'])
+
+        self.sd.putValue("Current Time", self.timer.get())
+        self.sd.putValue("in_threshold_start_time", self.in_threshold_start_time)
+        self.sd.putValue("in_threshold", self.in_threshold)
+        self.sd.putValue("in_threshold_time", self.in_threshold_time)
+
+        self.sd.putValue("Goal Angle", self.goal_angle)
         self.sd.putValue("Gyro Yaw", self.gyro.getYaw())
-        self.sd.putValue("Left Encoder Value",
-                         self.front_left_motor.getSelectedSonsorPosition())
-        self.sd.putValue("Right Encoder Value",
-                         self.front_right_motor.getSelectedSensorPosition())
-        self.drive.arcadeDrive(
-        	self.controller.getX(self.controller.Hand.kLeftHand),
-        	self.controller.getY(self.controller.Hand.kLeftHand),
-        	True
-        )
+        self.sd.putValue("Turning Value", turningValue)
+        self.sd.putValue("PGain", self.pGain)
+
+        self.sd.putValue("goal_tick_dist", self.goal_tick_dist)
+        self.sd.putValue("Left Encoder Value", self.front_left_motor.getSelectedSensorPosition())
+        self.sd.putValue("Distance Error", self.distance_error)
+        self.sd.putValue("Speed", self.speed)
 
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
-
