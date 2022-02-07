@@ -76,7 +76,7 @@ class MyRobot(wpilib.TimedRobot):
         },{
             "Step_Type": "Turn",
             "Distance": 0,
-            "Angle": 90,
+            "Angle": 180,
             "Threshold_Value": 1,
             "Threshold_Time": 1,
         },
