@@ -155,7 +155,7 @@ class MyRobot(wpilib.TimedRobot):
         self.sd.putValue("in_threshold_start_time", self.in_threshold_start_time)
         self.sd.putValue("in_threshold", self.in_threshold)
         self.sd.putValue("in_threshold_time", self.in_threshold_time)
-        self.sd.putValue("Steps Complete", self.steps_complete)
+        self.sd.putValue("Steps Complete?", self.steps_complete)
 
         self.sd.putValue("Goal Angle", self.goal_angle)
         self.sd.putValue("Gyro Yaw", self.gyro.getYaw())
