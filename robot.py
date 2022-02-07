@@ -56,11 +56,11 @@ class MyRobot(wpilib.TimedRobot):
         self.pGain = self.sd.getValue("PGain", 0.032)
         self.kP = self.sd.getValue("kP", 0.05)
         self.steps = [{
-            "Step_Type": "Straight",
-            "Distance": 3,
-            "Angle": 0,
-            "Threshold_Value": .1,
-            "Threshold_Time": 1,
+            "Step_Type": "Straight", #Step_Type says whether we will be driving forward, or turning in this step
+            "Distance": 3, # How far we need to move forward in this step
+            "Angle": 0, # What angle we need to turn to in this step
+            "Threshold_Value": .1, # To complete the step, we need to be within the threshold feet of the target distance
+            "Threshold_Time": 1, # Once we are in the threshold for this amount of time, we move to the next step
         },{
             "Step_Type": "Turn",
             "Distance": 0,
@@ -86,12 +86,15 @@ class MyRobot(wpilib.TimedRobot):
         self.in_threshold_time = 0
         self.in_threshold_start_time = 0
         self.in_threshold = False
+        self.steps_complete = False
 
     def teleopPeriodic(self):
         self.isAPressed = self.controller.getAButton()
         self.isBPressed = self.controller.getBButton()
         self.isXPressed = self.controller.getXButton()
         self.isYPressed = self.controller.getYButton()
+        if self.steps_complete:
+            return
         if self.in_threshold:
             self.in_threshold_time = self.timer.get() - self.in_threshold_start_time
         else:
@@ -113,7 +116,11 @@ class MyRobot(wpilib.TimedRobot):
                 if self.in_threshold_time > self.current_step['Threshold_Time']:
                     #Been in threshold for a good amount of time, move to next step
                     self.current_step_index += 1
-                    self.current_step = self.steps[self.current_step_index]
+                    if self.current_step_index == len(self.steps):
+                        self.steps_complete = True
+                        return
+                    else:
+                        self.current_step = self.steps[self.current_step_index]
                     self.front_left_motor.setSelectedSensorPosition(0, 0, 10)
                     self.in_threshold = False
             else:
@@ -148,6 +155,7 @@ class MyRobot(wpilib.TimedRobot):
         self.sd.putValue("in_threshold_start_time", self.in_threshold_start_time)
         self.sd.putValue("in_threshold", self.in_threshold)
         self.sd.putValue("in_threshold_time", self.in_threshold_time)
+        self.sd.putValue("Steps Complete", self.steps_complete)
 
         self.sd.putValue("Goal Angle", self.goal_angle)
         self.sd.putValue("Gyro Yaw", self.gyro.getYaw())
