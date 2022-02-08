@@ -93,38 +93,39 @@ class MyRobot(wpilib.TimedRobot):
         self.isBPressed = self.controller.getBButton()
         self.isXPressed = self.controller.getXButton()
         self.isYPressed = self.controller.getYButton()
+        if self.isXPressed: #Use X to cancel program
+            self.steps_complete = True
+            return
         if self.steps_complete:
             return
         if self.in_threshold:
             self.in_threshold_time = self.timer.get() - self.in_threshold_start_time
         else:
             self.in_threshold_time = 0
-        #check threshold
-        if self.isBPressed:
-            #Determine if in threshold
-            if self.current_step['Step_Type'] == "Straight":
-                current_in_threshold = abs(self.goal_tick_dist - self.front_left_motor.getSelectedSensorPosition()) < self.current_step[
-                    'Threshold_Value']
-            elif self.current_step['Step_Type'] == "Turn":
-                current_in_threshold = self.goal_angle - self.gyro.getYaw() < self.current_step['Threshold_Value']
+        #Determine if in threshold
+        if self.current_step['Step_Type'] == "Straight":
+            current_in_threshold = abs(self.goal_tick_dist - self.front_left_motor.getSelectedSensorPosition()) < self.current_step[
+                'Threshold_Value']
+        elif self.current_step['Step_Type'] == "Turn":
+            current_in_threshold = self.goal_angle - self.gyro.getYaw() < self.current_step['Threshold_Value']
 
-            if current_in_threshold:
-                if self.in_threshold == False:
-                    #Just entered the threshold
-                    self.in_threshold = True
-                    self.in_thershold_start_time = self.timer.get()
-                if self.in_threshold_time > self.current_step['Threshold_Time']:
-                    #Been in threshold for a good amount of time, move to next step
-                    self.current_step_index += 1
-                    if self.current_step_index == len(self.steps):
-                        self.steps_complete = True
-                        return
-                    else:
-                        self.current_step = self.steps[self.current_step_index]
-                    self.front_left_motor.setSelectedSensorPosition(0, 0, 10)
-                    self.in_threshold = False
-            else:
+        if current_in_threshold:
+            if self.in_threshold == False:
+                #Just entered the threshold
+                self.in_threshold = True
+                self.in_thershold_start_time = self.timer.get()
+            if self.in_threshold_time > self.current_step['Threshold_Time']:
+                #Been in threshold for a good amount of time, move to next step
+                self.current_step_index += 1
+                if self.current_step_index == len(self.steps):
+                    self.steps_complete = True
+                    return
+                else:
+                    self.current_step = self.steps[self.current_step_index]
+                self.front_left_motor.setSelectedSensorPosition(0, 0, 10)
                 self.in_threshold = False
+        else:
+            self.in_threshold = False
 
         #Setting Speed
         if self.current_step['Step_Type'] == "Straight":
