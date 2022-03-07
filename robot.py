@@ -37,11 +37,13 @@ class MyRobot(wpilib.TimedRobot):
         self.rotateArm = rev.CANSparkMax(constants["rotateArm"], rev.CANSparkMaxLowLevel.MotorType.kBrushed)
 
         self.controller = wpilib.XboxController(0)
+        self.contoller2 = wpilib.XboxController(1)
         self.timer = wpilib.Timer()
         self.sd = NetworkTables.getTable("SmartDashboard")
         self.gyro = navx.AHRS.create_i2c()
         self.leftTalon.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
         self.rightTalon.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
+        self.climbingMode = False
 
     def autnomousInit(self):
         self.timer.reset()
@@ -53,7 +55,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopInit(self):
         print("Starting teleop...")
         self.mode = [False, False] # ['straight', 'backward']
-        self.speed = [1, 1]
+        self.speed = [0.8, 0.8]
         self.turn = [False, False]
         self.humancontrol = True
         self.motor = [0, 0]
@@ -67,43 +69,83 @@ class MyRobot(wpilib.TimedRobot):
 
         # if self.controller.getPOV() == 90:
         #     self.turnright90()
-
-        if self.controller.getAButton():
-            # Intake
-            self.snowveyor.arcadeDrive(0.3, 0)
-            pass
-        elif self.controller.getBButton():
-            pass
-        elif self.controller.getYButton():
-            # Outtake
-            self.snowveyor.arcadeDrive(0.3, 0.3)
-            pass
-        elif self.controller.getXButton():
-            pass
-
-
-        if self.controller.getRightTriggerAxis() >= 0.2:
-            self.liftArm.set(0.8)
-        elif self.controller.getLeftTriggerAxis() >= 0.2:
-            self.liftArm.set(-0.8)
+        if not self.climbingMode:
+            reverse = False
+            gostraight = False
+            if self.controller.getLeftBumperPressed():
+                gostraight = True
+            if self.controller.getRightBumper():
+                reverse = True
+            if self.controller2.getStartButtonPressed():
+                self.climbingMode = True
+                print("Entered climbing mode")
+                return
+            if self.controller.getAButton():
+                self.speed = [0.5, 0.5] #half speed
+            elif self.controller.getBButton():
+                self.speed = [0.25, 0.25] #quarter speed
+            elif self.controller.getYButton():
+                self.speed = [0.1, 0.1] #inch
+            elif self.controller.getXButton():
+                #Taunt
+                pass
+              
+            if gostraight:
+                whichbumper = (self.controller.getRightTriggerAxis() + self.controller.getLeftTriggerAxis())/2
+                if self.controller.getRightTriggerAxis() < 0.2:
+                    whichbumper = self.controller.getRightTriggerAxis()
+                elif self.controller.getLeftTriggerAxis() < 0.2:
+                    whichbumper = self.controller.getLeftTriggerAxis()
+                self.motor = [whichbumper, whichbumper]
+            elif self.humancontrol:
+                print('human' + str(self.motor[0]) + str(self.motor[1])) #use joystick to set a percentage of speed
+                self.motor = [self.controller.getRightTriggerAxis() * self.speed[0], self.controller.getLeftTriggerAxis() * self.speed[1]]
+            else:
+                print('robot' + str(self.motor[0]) + str(self.motor[1]))
+            if reverse:
+                self.motor = [x * -1 for x in self.motor]
+              
+            if self.controller2.getRightTriggerAxis() >= 0.2:
+                self.liftArm.set(0.25)
+            elif self.controller2.getLeftTriggerAxis() >= 0.2:
+                self.liftArm.set(-0.25)
+            else:
+                self.liftArm.set(0)
         else:
-            self.liftArm.set(0)
+            if self.controller2.getStartButtonPressed():
+                self.climbingMode = False
+                print("Left climbing mode")
+                return
+            if self.controller2.getXButton():
+                self.rotateArm.set(0.25)
+            elif self.controller2.getBButton():
+                self.rotateArm.set(-0.25)
+            else:
+                 self.rotateArm.set(0)
 
-        if self.controller.getRightBumper():
-            self.rotateArm.set(.8)
-        elif self.controller.getLeftBumper():
-            self.rotateArm.set(-0.8)
-        else:
-            self.rotateArm.set(0)
+            if self.controller2.getYButton() >= 0.2:
+                self.liftArm.set(0.25)
+            elif self.controller2.getAButton() >= 0.2:
+                self.liftArm.set(-0.25)
+            else:
+                self.liftArm.set(0)
+
+            if self.controller2.getPOV() <= 315 and self.controller2.getPOV() > 225:
+                self.speed = [-0.2, -0.2]
+            elif self.controller2.getPOV() <= 225 and self.controller2.getPOV() > 135:
+                self.speed = [0, 0.2]
+            elif self.controller2.getPOV() <= 135 and self.controller2.getPOV() > 45:
+                self.speed = [0.2, 0.2]
+            elif self.controller2.getPOV() <= 45:
+                self.speed = [0.2, 0]
+            else:
+                self.speed = [0,0]
           
         # self.mode = not self.mode if self.controller.getLeftBumperPressed() else self.mode # straight mode
         # self.mode = not self.mode if self.controller.getRightBumperPressed() else self.mode # backward mode
 
-        if self.humancontrol:
-            print('human' + str(self.motor[0]) + str(self.motor[1]))
-            self.motor = [self.controller.getLeftY() * self.speed[0], self.controller.getLeftX() * self.speed[1]]
-        else:
-            print('robot' + str(self.motor[0]) + str(self.motor[1]))
+        
+        
 
         self.drive.arcadeDrive(self.motor[0], self.motor[1])
 
