@@ -131,13 +131,13 @@ class MyRobot(wpilib.TimedRobot):
                 self.liftArm.set(0)
 
             if self.controller2.getPOV() <= 315 and self.controller2.getPOV() > 225:
-                self.speed = [-0.2, -0.2]
-            elif self.controller2.getPOV() <= 225 and self.controller2.getPOV() > 135:
                 self.speed = [0, 0.2]
+            elif self.controller2.getPOV() <= 225 and self.controller2.getPOV() > 135:
+                self.speed = [-0.2, -0.2]
             elif self.controller2.getPOV() <= 135 and self.controller2.getPOV() > 45:
-                self.speed = [0.2, 0.2]
-            elif self.controller2.getPOV() <= 45:
                 self.speed = [0.2, 0]
+            elif self.controller2.getPOV() <= 45:
+                self.speed = [0.2, 0.2]
             else:
                 self.speed = [0,0]
           
