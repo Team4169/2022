@@ -33,7 +33,7 @@ class MyRobot(wpilib.TimedRobot):
         self.liftArm = rev.CANSparkMax(constants["liftArm"], rev.CANSparkMaxLowLevel.MotorType.kBrushed)
         self.rotateArm = rev.CANSparkMax(constants["rotateArm"], rev.CANSparkMaxLowLevel.MotorType.kBrushless)
 
-        self.rotateEncoder = self.rotateArm.getEncoder()
+        self.rotateEncoder = self.rotateArm.getEncoder() #Where rotate encoder???
         self.liftEncoder = self.liftArm.getEncoder(rev.SparkMaxRelativeEncoder.Type.kQuadrature)
         self.yaw = 0
         self.leftTalon.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
@@ -45,6 +45,9 @@ class MyRobot(wpilib.TimedRobot):
         self.timer = wpilib.Timer()
         self.sd = NetworkTables.getTable("SmartDashboard")
         self.gyro = navx.AHRS.create_i2c()
+        
+        self.liftLog=0
+        self.rotateLog=0
 
 
     def autnomousInit(self):
@@ -83,13 +86,26 @@ class MyRobot(wpilib.TimedRobot):
         if self.climbMode:
             if self.operatorController.getYButtonPressed():
                 self.liftArm.set(0.5)
+                self.liftLog=self.liftEncoder.getPosition()
+      
             elif self.operatorController.getAButtonPressed():
                 self.liftArm.set(-0.5)
+                self.liftLog=self.liftEncoder.getPosition()
+                
 
             if self.operatorController.getXButtonPressed():
                 self.rotateArm.set(-0.5)
+                self.rotateLog=self.rotateEncoder.getPosition()
+            
             elif self.operatorController.getBButtonPressed():
                 self.rotateArm.set(0.5)
+                self.rotateLog=self.rotateEncoder.getPosition()
+            
+            if self.operatorController.getLeftBumperPressed():
+                print("--------START OF STEP--------")
+                print("Lift Encoder Log: ", + str(self.liftLog))
+                print("Rotate Encoder Log: ", + str(self.rotateLog))
+                print("--------END OF STEP--------")
 
             dir = self.operatorController.getPOV()
             if 225 < dir <= 315:
