@@ -101,6 +101,8 @@ class MyRobot(commands2.TimedCommandRobot):
         self.output("newdriveencodervalueleft", self.container.drive.leftTalon.getSelectedSensorPosition())
         self.output("newdriveencodervalueright", self.container.drive.rightTalon.getSelectedSensorPosition())
         self.output("climb mode",self.climbMode)
+        if self.operatorController.getLeftStickButtonPressed():
+            self.container.climb.allow_negative_lifting_arm = not self.container.climb.allow_negative_lifting_arm
         if self.driverController.getLeftBumper():
             self.output("straight mode", True)
             self.direction = 0

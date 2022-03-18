@@ -20,3 +20,5 @@ class MoveLiftArm(commands2.CommandBase):
     def isFinished(self) -> bool:
         if self.climb.getLiftArmLimitSwitchPressed() and self.power > 0:
             return True
+        if self.climb.getLiftArmEncoderDistance() < 50 and not self.climb.allow_negative:
+            return True

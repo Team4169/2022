@@ -66,6 +66,8 @@ class RobotContainer:
 
         self.rotateEncoder = self.rotateArm.getEncoder()
         self.liftEncoder = self.liftArm.getEncoder(rev.SparkMaxRelativeEncoder.Type.kQuadrature)
+        self.rotateEncoder.setPosition(0)
+        self.liftEncoder.setPosition(0)
 
         self.liftArmUpLimitSwitch = wpilib.DigitalInput(constants.liftArmUpLimitSwitch)
         self.liftArmDownLimitSwitch = wpilib.DigitalInput(constants.liftArmDownLimitSwitch)
@@ -127,7 +129,6 @@ class RobotContainer:
         self.chooser.addOption("zeroBall", self.zeroBall)
         # Put the chooser on the dashboard
         wpilib.SmartDashboard.putData("Autonomous", self.chooser)
-
         # self.configureButtonBindings()
 
         # set up default drive command
@@ -153,9 +154,6 @@ class RobotContainer:
         # )
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).whenHeld(
             MoveLiftArm(-.5, self.climb)
-        )
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).whenHeld(
-            MoveLiftArm(.5, self.climb)
         )
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).whenHeld(
             MoveRotateArm(.5, self.climb)

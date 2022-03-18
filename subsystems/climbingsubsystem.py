@@ -21,6 +21,7 @@ class ClimbingSubsystem(commands2.SubsystemBase):
         self.rotateArmBackLimitSwitch = rotateArmBackLimitSwitch
         self.rotateArmRobotLimitSwitch = rotateArmRobotLimitSwitch
 
+        self.allow_negative_lifting_arm = False
 
         # smartdashboard
         self.sd = NetworkTables.getTable("SmartDashboard")
