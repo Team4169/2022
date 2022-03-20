@@ -25,6 +25,7 @@ from commands.SnowVeyerCommands.outtake import Outtake
 
 
 from commands.climbingCommands.moveRotateArm import MoveRotateArm
+from commands.climbingCommands.moveRotateArmPastLocation import MoveRotateArmPastLocation
 from commands.climbingCommands.liftArmToTop import LiftArmToTop
 from commands.climbingCommands.moveLiftArm import MoveLiftArm
 from commands.climbingCommands.moveLiftArmToLimitSwitch import MoveLiftArmToLimitSwitch
@@ -64,7 +65,7 @@ class RobotContainer:
 
         self.liftArm.setInverted(True)
 
-        self.rotateEncoder = self.rotateArm.getEncoder()
+        self.rotateEncoder = self.rotateArm.getEncoder(rev.SparkMaxRelativeEncoder.Type.kHallSensor)
         self.liftEncoder = self.liftArm.getEncoder(rev.SparkMaxRelativeEncoder.Type.kQuadrature)
 
         self.liftArmUpLimitSwitch = wpilib.DigitalInput(constants.liftArmUpLimitSwitch)
@@ -148,8 +149,8 @@ class RobotContainer:
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kLeftBumper).whenHeld(
             MoveLiftArm(-.5, self.climb)
         )
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).whenHeld(
-            MoveLiftArm(1, self.climb)
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).whenPressed(
+            MoveLiftArmToLimitSwitch(1, self.climb)
         )
         # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).whenHeld(
         #     MoveLiftArm(.5, self.climb)
@@ -163,8 +164,9 @@ class RobotContainer:
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).whenHeld(
             MoveRotateArm(.3, self.climb)
         )
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).whenHeld(
-            MoveRotateArm(-.3, self.climb)
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).whenPressed(
+            MoveRotateArmPastLocation(-30, False, -.3, self.climb)
+            # MoveRotateArm(-.3, self.climb)
         )      
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kBack).whenHeld(
            coastRotateArm(self.coastBool, self.climb)

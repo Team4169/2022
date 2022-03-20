@@ -97,6 +97,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def teleopPeriodic(self):
         self.output("current brake mode", self.container.climb.rotateArm.getIdleMode())
+        self.output("rotateencoder value new", self.container.rotateEncoder.getPosition())
         self.output("liftencoder value new", self.container.climb.liftEncoder.getPosition())
         self.output("newdriveencodervalueleft", self.container.drive.leftTalon.getSelectedSensorPosition())
         self.output("newdriveencodervalueright", self.container.drive.rightTalon.getSelectedSensorPosition())
