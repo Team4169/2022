@@ -165,6 +165,21 @@ class MyRobot(commands2.TimedCommandRobot):
 
         elif self.operatorController.getRightBumper():
             self.snowveyor.tankDrive(1,-1)
+        
+        if wpilib.DriverStation.getJoystickName(2) != "":
+            
+            if self.BopItController.getYButton(): #Pull
+                self.snowveyor.tankDrive(1,0)
+
+            elif self.BopItController.getRightBumper(): #Flick
+                self.snowveyor.tankDrive(1,-1)
+
+            elif self.BopItController.getBButton(): #Twist
+                self.snowveyor.tankDrive(1,0)
+
+            elif self.BopItController.getXButton(): #Bop-It
+                self.snowveyor.tankDrive(1,-1)
+
 
 
         self.drive.arcadeDrive(self.speed, self.direction)

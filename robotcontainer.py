@@ -50,6 +50,7 @@ class RobotContainer:
 
         self.driverController = wpilib.XboxController(constants.kDriverControllerPort)
         self.operatorController = wpilib.XboxController(constants.kSnowveyorControllerPort)
+        self.BopItController = wpilib.XboxController(constants.kBopItControllerPort)
 
         self.leftTalon = ctre.WPI_TalonSRX(constants.leftTalon)
         self.leftVictor = ctre.WPI_VictorSPX(constants.leftVictor)

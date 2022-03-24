@@ -32,6 +32,7 @@ kAutoDriveSpeed = 0.2
 # Operator Interface
 kDriverControllerPort = 0
 kSnowveyorControllerPort = 1
+kBopItControllerPort = 2
 
 # Physical parameters
 kDriveTrainMotorCount = 2
@@ -52,11 +53,11 @@ rotateArm = 4
 
 liftArmUpLimitSwitch = 0
 liftArmUpLimitSwitchPressedValue = False
-liftArmDownLimitSwitch = 2
+liftArmDownLimitSwitch = 1
 liftArmDownLimitSwitchPressedValue = False
-rotateArmBackLimitSwitch = 3
+rotateArmBackLimitSwitch = 2
 rotateArmBackLimitSwitchPressedValue = False
-rotateArmRobotLimitSwitch = 1
+rotateArmRobotLimitSwitch = 3
 rotateArmRobotLimitSwitchPressedValue = False
 
 liftArmSlowSpeed = .1
