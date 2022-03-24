@@ -36,6 +36,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
         self.driverController = self.container.driverController
         self.operatorController = self.container.operatorController
+        self.BopItController = self.container.BopItController
 
         self.leftTalon = self.container.leftTalon
         self.leftVictor = self.container.leftVictor
