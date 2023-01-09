@@ -89,7 +89,7 @@ class MyRobot(commands2.TimedCommandRobot):
       ResetGyro(drive)
       if run == 1:
         #Put the cone/cube into the middle/bottom rung (i don't know which it will be)
-        MoveCommand(6.71875, 0, drive)
+        MoveCommand(-6.71875, 0, drive)
         #start the balencing program
         
       if run == 2:
