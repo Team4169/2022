@@ -79,10 +79,36 @@ class MyRobot(commands2.TimedCommandRobot):
         #
         if self.autonomousCommand:
             self.autonomousCommand.schedule()
+          
 
     def autonomousPeriodic(self) -> None:
-        """This function is called periodically during autonomous"""
-        #write auto code here
+      """This function is called periodically during autonomous"""
+      #write auto code here
+
+      run = 1 #this probably doesn't go here
+      ResetGyro(drive)
+      if run == 1:
+        #Put the cone/cube into the middle/bottom rung (i don't know which it will be)
+        MoveCommand(6.71875, 0, drive)
+        #start the balencing program
+        
+      if run == 2:
+        #Put the cone/cube into the middle/bottom rung (i don't know which it will be)
+        MoveCommand(-1.25, 0, drive)
+        MoveCommand(0, 270, drive)
+        MoveCommand(6, 270, drive)
+        MoveCommand(0, 180, drive)
+        MoveCommand(15.5625, 180, drive)
+        #Pick up cone/cube
+        MoveCommand(0, 0, drive)
+        MoveCommand(15.5625, 0, drive)
+        MoveCommand(0, 90, drive)
+        MoveCommand(4.16667, 90, drive)
+        MoveCommand(0, 0, drive)
+        MoveCommand(1.25, 0, drive)
+        #place cone/cube in mid/bottom rung
+        
+        
 
     def teleopInit(self) -> None:
         # This makes sure that the autonomous stops running when
