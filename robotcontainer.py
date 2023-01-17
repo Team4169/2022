@@ -51,7 +51,7 @@ class RobotContainer:
     def __init__(self) -> None:
 
         self.driverController = wpilib.XboxController(constants.kDriverControllerPort)
-        # self.operatorController = wpilib.XboxController(constants.kSnowveyorControllerPort)
+        self.operatorController = wpilib.XboxController(constants.kSnowveyorControllerPort)
 
         self.leftTalon = ctre.WPI_TalonSRX(constants.leftTalon)
         self.leftTalon2 = ctre.WPI_TalonSRX(constants.leftTalon2)

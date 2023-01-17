@@ -38,7 +38,7 @@ class MyRobot(commands2.TimedCommandRobot):
         self.container = RobotContainer()
 
         self.driverController = self.container.driverController
-        # self.operatorController = self.container.operatorController
+        self.operatorController = self.container.operatorController
 
         self.leftTalon = self.container.leftTalon
         self.leftTalon2 = self.container.leftTalon2
@@ -63,6 +63,11 @@ class MyRobot(commands2.TimedCommandRobot):
         # self.snowveyor = self.container.snowveyor
 
         self.drive = self.container.drive
+
+        # LEDserver (Arduino) is on I2C port 100
+        # connected via the RoboRio's MXP i2c port
+        self.LEDserver = wpilib.I2C(wpilib.I2C.Port.kMXP, 100)
+
 
 
 
@@ -168,6 +173,22 @@ class MyRobot(commands2.TimedCommandRobot):
             self.speed *= 0.5
             self.direction *= 0.5
 
+        isAPressed = self.operatorController.getAButton()
+        isBPressed = self.operatorController.getBButton()
+        isXPressed = self.operatorController.getXButton()
+        isYPressed = self.operatorController.getYButton()
+        if(isAPressed):
+            #self.front_left_motor.set(0.5)
+            self.sendLEDCommand(1)
+        if(isBPressed):
+            #self.rear_left_motor.set(0.5)
+            self.sendLEDCommand(2)
+        if(isXPressed):
+            #self.front_right_motor.set(0.5)
+            self.sendLEDCommand(3)
+        if(isYPressed):
+            #self.rear_right_motor.set(0.5)
+            self.sendLEDCommand(4)
 
         # if self.operatorController.getLeftTriggerAxis() > 0.2:
         #     self.snowveyor.tankDrive(1,0)
@@ -188,6 +209,15 @@ class MyRobot(commands2.TimedCommandRobot):
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
         commands2.CommandScheduler.getInstance().cancelAll()
+
+    def sendLEDCommand(self, command):
+        # send the specified command to the LEDserver
+        if self.LEDserver.writeBulk(memoryview(bytes([command]))):
+            print("Got an error sending command ", command)
+            return True
+        else:
+            print("Success sending command ", command)
+            return False
 
 
 if __name__ == "__main__":
