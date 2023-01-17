@@ -64,11 +64,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
         self.drive = self.container.drive
 
-        # LEDserver (Arduino) is on I2C port 100
-        # connected via the RoboRio's MXP i2c port
-        self.LEDserver = wpilib.I2C(wpilib.I2C.Port.kMXP, 100)
-
-
+        self.LEDserver = self.container.LEDserver
 
 
     def disabledInit(self) -> None:
@@ -190,17 +186,17 @@ class MyRobot(commands2.TimedCommandRobot):
             #self.rear_right_motor.set(0.5)
             self.sendLEDCommand(4)
 
-        # if self.operatorController.getLeftTriggerAxis() > 0.2:
-        #     self.snowveyor.tankDrive(1,0)
-        #
-        # elif self.operatorController.getRightTriggerAxis() > 0.2:
-        #     self.snowveyor.tankDrive(1,-1)
-        #
-        # elif self.operatorController.getLeftBumper():
-        #     self.snowveyor.tankDrive(-1,0)
-        #
-        # elif self.operatorController.getRightBumper():
-        #     self.snowveyor.tankDrive(-1,1)
+        if self.operatorController.getLeftTriggerAxis() > 0.2:
+            self.snowveyor.tankDrive(1,0)
+
+        elif self.operatorController.getRightTriggerAxis() > 0.2:
+            self.snowveyor.tankDrive(1,-1)
+
+        elif self.operatorController.getLeftBumper():
+            self.snowveyor.tankDrive(-1,0)
+
+        elif self.operatorController.getRightBumper():
+            self.snowveyor.tankDrive(-1,1)
 
 
         self.drive.arcadeDrive(self.speed, self.direction)

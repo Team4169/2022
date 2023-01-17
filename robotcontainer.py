@@ -94,6 +94,11 @@ class RobotContainer:
                                     rightTalon=self.rightTalon,
                                     rightTalon2=self.rightTalon2)
 
+        # LEDserver (Arduino) is on I2C port 100
+        # connected via the RoboRio's MXP i2c port
+        self.LEDserver = wpilib.I2C(wpilib.I2C.Port.kMXP, 100)
+
+
         # self.snowveyor = SnowveyorSubsystem(intake=self.intake,
         #                                     outtake=self.outtake,
         #                                     snowveyor=self.snowveyor)
@@ -119,7 +124,7 @@ class RobotContainer:
 
         # A complex auto routine that drives forward, and then drives backward.
         #  self.lucAutoCommand = LucAutoCommand(self.drive, self.snowveyor)
-        self.lucAutoCommand = LucAutoCommand(self.drive)
+        self.lucAutoCommand = LucAutoCommand(self.drive, self.LEDserver)
         self.centerRobotToTarget = CenterRobotToTarget(self.drive, self.neoMotor)
         # self.lucAutoCommand2 = LucAutoCommand2(self.drive, self.snowveyor)
         # #simpler auto routine that drives to the second ball and places 2 into the smaller hub
@@ -207,7 +212,7 @@ class RobotContainer:
     #     commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kA).whenPressed(
     #         DoNothing()
     #     )
-    #
+
     #
     #
     def getAutonomousCommand(self) -> commands2.Command:
