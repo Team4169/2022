@@ -18,12 +18,20 @@ class LucAutoCommand(commands2.SequentialCommandGroup):
     def __init__(self, drive: DriveSubsystem): #def __init__(self, drive: DriveSubsystem, snowveyor: SnowveyorSubsystem):
         super().__init__(
             # Drive forward the specified distance
-            ResetGyro(drive),
-            MoveCommand(5, 0, drive),
-            MoveCommand(0, 120, drive),
-            MoveCommand(5, 120,drive),
-            MoveCommand(0,240, drive),
-            MoveCommand(5,240, drive),
+        ResetGyro(drive),
+        # MoveCommand(-6.71875, 0, drive)
+        # start the balencing program
 
-            #MoveCommand(5, 360, drive)
+        MoveCommand(-1.25, 0, drive),
+        MoveCommand(0, 270, drive),
+        MoveCommand(6, 270, drive),
+        MoveCommand(0, 180, drive),
+        MoveCommand(15.5625, 180, drive),
+        # Pick up cone/cube
+        MoveCommand(0, 0, drive),
+        MoveCommand(15.5625, 0, drive),
+        MoveCommand(0, 90, drive),
+        MoveCommand(4.16667, 90, drive),
+        MoveCommand(0, 0, drive),
+        MoveCommand(1.25, 0, drive)
         )

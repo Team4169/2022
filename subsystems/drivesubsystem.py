@@ -22,8 +22,7 @@ class DriveSubsystem(commands2.SubsystemBase):
 
         # smartdashboard
         self.sd = NetworkTables.getTable("SmartDashboard")
-
-        # Create PID Controller for Turning
+        self.testNet = NetworkTables.getTable("Test")
         self.TurnkP = self.sd.getValue("TurnkP", 0.032)
         self.TurnkI = self.sd.getValue("TurnkI", 0)
         self.TurnkD = self.sd.getValue("TurnkD", 0)
