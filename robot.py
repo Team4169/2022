@@ -41,35 +41,11 @@ class MyRobot(commands2.TimedCommandRobot):
         self.container = RobotContainer()
 
         self.driverController = self.container.driverController
-        # self.operatorController = self.container.operatorController
 
         self.leftTalon = self.container.leftTalon
         self.leftTalon2 = self.container.leftTalon2
         self.rightTalon = self.container.rightTalon
         self.rightTalon2 = self.container.rightTalon2
-
-        self.mech = wpilib.drive.MecanumDrive(
-            self.leftTalon,
-            self.leftTalon2,
-            self.rightTalon,
-            self.rightTalon2,
-        )
-        # self.neoMotor = self.container.neoMotor
-
-        #self.liftArm = self.container.liftArm
-        #self.rotateArm = self.container.rotateArm
-
-        # self.rotateEncoder = self.container.rotateEncoder
-        # self.liftEncoder = self.container.liftEncoder
-
-        # self.liftArmUpLimitSwitch = self.container.liftArmUpLimitSwitch
-        # self.liftArmDownLimitSwitch = self.container.liftArmDownLimitSwitch
-        #self.rotateArmBackLimitSwitch = self.container.rotateArmBackLimitSwitch
-        #self.rotateArmRobotLimitSwitch = self.container.rotateArmRobotLimitSwitch
-
-        # self.intake = self.container.intake
-        # self.outtake = self.container.outtake
-        # self.snowveyor = self.container.snowveyor
 
         self.drive = self.container.drive
 
@@ -104,28 +80,15 @@ class MyRobot(commands2.TimedCommandRobot):
         # print("Starting teleop...")
         self.humancontrol = True
         self.speed = 0
-        self.intake = 0
-        self.outtake = 0
-        self.climbMode = False
         self.direction = 0
 
 
 
     def teleopPeriodic(self):
-        #self.neoMotor.set(self.driverController.getRightTriggerAxis()/4)  # sets neo motor running at power = .1 out of 1
-        self.container.drive.gyroOut.set(self.container.drive.gyro.getYaw())
-        # self.output("current brake mode", self.container.climb.rotateArm.getIdleMode())
-        # self.output("liftencoder value new", self.container.climb.liftEncoder.getPosition())
-        # self.output("newdriveencodervalueleft", self.container.drive.leftTalon.getSelectedSensorPosition())
-        # self.output("newdriveencodervalueright", self.container.drive.rightTalon.getSelectedSensorPosition())
-        # self.output("climb mode",self.climbMode)
 
-        if self.driverController.getLeftBumper():
-            self.output("straight mode", True)
-            self.direction = 0
-        else:
-            self.output("straight mode", False)
-            self.direction = self.driverController.getLeftX()
+        self.container.drive.gyroOut.set(self.container.drive.gyro.getYaw())
+
+       
         self.leftX = self.driverController.getLeftX()
         self.leftY = -self.driverController.getLeftY()
         self.rightX = self.driverController.getRightX()
@@ -165,35 +128,8 @@ class MyRobot(commands2.TimedCommandRobot):
         # self.rightTalon2.set(self.backRightMotor)
 
 
-        # if self.operatorController.getStartButtonPressed():
-        #     # self.output("")
-        #     self.climbMode = not self.climbMode
-        #     if self.climbMode:
-        #         self.container.bindClimbMode()
-        #     else:
-        #         self.container.unbindClimbMode()
-        #
-        # if self.climbMode:
-        #     dir = self.operatorController.getPOV()
-        #     self.speed = 0.5
-        #     if dir == 0:
-        #         self.direction = 0
-        #     elif dir == 90:
-        #         self.speed = 0
-        #         self.direction = 0.7
-        #     elif dir == 180:
-        #         self.speed *= -1
-        #         self.direction = 0
-        #     elif dir == 270:
-        #         self.speed = 0
-        #         self.direction = -0.7
-        #     else:
-        #         self.speed = 0
-        #     self.output("endgame dir",dir)
-        #     self.output("endgame drive speed",self.speed)
-        #     self.drive.arcadeDrive(self.speed, self.direction)
-        #     return
-        self.mech.driveCartesian(self.leftX, self.leftY, self.rightX) #self.gyroRad
+        
+        self.drive.driveCartesian(self.leftX, self.leftY, self.rightX) #self.gyroRad
         
         # if self.driverController.getAButton():
         #     self.leftTalon2.set(1)
@@ -208,20 +144,6 @@ class MyRobot(commands2.TimedCommandRobot):
         #     self.leftTalon.set(1)
 
 
-        # if self.operatorController.getLeftTriggerAxis() > 0.2:
-        #     self.snowveyor.tankDrive(1,0)
-        #
-        # elif self.operatorController.getRightTriggerAxis() > 0.2:
-        #     self.snowveyor.tankDrive(1,-1)
-        #
-        # elif self.operatorController.getLeftBumper():
-        #     self.snowveyor.tankDrive(-1,0)
-        #
-        # elif self.operatorController.getRightBumper():
-        #     self.snowveyor.tankDrive(-1,1)
-
-
-        #self.drive.arcadeDrive(self.speed, self.direction)
 
 
     def testInit(self) -> None:

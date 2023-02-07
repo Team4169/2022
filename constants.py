@@ -31,7 +31,7 @@ kAutoDriveSpeed = 0.2
 
 # Operator Interface
 kDriverControllerPort = 0
-kSnowveyorControllerPort = 1
+
 
 # Physical parameters
 kDriveTrainMotorCount = 2
@@ -39,34 +39,5 @@ kTrackWidth = 0.381 * 2
 kGearingRatio = 8
 kWheelRadius = 0.0508
 
-# kEncoderResolution = -
-
-
-#SnowVeyor
-intake = 10
-outtake = 12
-
-# Climbing
-liftArm = 5
-rotateArm = 4
-
-liftArmUpLimitSwitch = 0
-liftArmUpLimitSwitchPressedValue = False
-liftArmDownLimitSwitch = 2
-liftArmDownLimitSwitchPressedValue = False
-rotateArmBackLimitSwitch = 3
-rotateArmBackLimitSwitchPressedValue = False
-rotateArmRobotLimitSwitch = 1
-rotateArmRobotLimitSwitchPressedValue = False
-
-liftArmSlowSpeed = .1
-liftArmFastSpeed = .5
-liftArmCloseToBottomTicks = -100
-liftArmCloseToTopTicks = -500
-
-rotateArmSlowSpeed = .05
-rotateArmFastSpeed = .1
-rotateArmCloseToRobotTicks = 50
-rotateArmCloseToBackTicks = 100
 
 deadzone = .1

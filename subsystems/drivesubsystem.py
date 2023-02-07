@@ -46,10 +46,12 @@ class DriveSubsystem(commands2.SubsystemBase):
         # The robot's drive
         # self.rightTalon.setInverted(True)
         # self.rightTalon2.setInverted(True)
-        self.drive = wpilib.drive.DifferentialDrive(
-            wpilib.MotorControllerGroup(self.leftTalon, self.leftTalon2),
-            wpilib.MotorControllerGroup(self.rightTalon, self.rightTalon2)
-            )
+        self.drive = wpilib.drive.MecanumDrive(
+            self.leftTalon,
+            self.leftTalon2,
+            self.rightTalon,
+            self.rightTalon2,
+        )
 
         # The left-side drive encoder
         # NOTE FROM NOAH - I commented the encoders out, will use the talon interface to get encoders
@@ -66,19 +68,15 @@ class DriveSubsystem(commands2.SubsystemBase):
         self.leftTalon.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
         self.rightTalon.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 0)
 
-        # Sets the distance per pulse for the encoders
-        # NOTE FROM NOAH - Expirement with these two following lines later, for now commenting them out
-        # self.leftEncoder.setDistancePerPulse(constants.kEncoderDistancePerPulse)
-        # self.rightEncoder.setDistancePerPulse(constants.kEncoderDistancePerPulse)
-
-    def arcadeDrive(self, fwd: float, rot: float) -> None:
+        
+    def driveCartesian(self, x: float, y:float, zrot:float) -> None:
         """
         Drives the robot using arcade controls.
 
         :param fwd: the commanded forward movement
         :param rot: the commanded rotation
         """
-        self.drive.arcadeDrive(fwd, rot)
+        self.drive.driveCartesian(x,y,zrot)
 
     def resetEncoders(self) -> None:
         self.leftTalon.setSelectedSensorPosition(0, 0, 10)
@@ -87,14 +85,12 @@ class DriveSubsystem(commands2.SubsystemBase):
 
     def getAverageEncoderDistance(self) -> float:
         """Gets the average distance of the TWO encoders."""
-        # self.sd.putValue("Left Encoder Value", self.leftTalon.getSelectedSensorPosition())
-        # self.sd.putValue("Right Encoder Value", self.rightTalon.getSelectedSensorPosition())
+        
         return (self.leftTalon.getSelectedSensorPosition()  * 12 / self.tpf)
 
     def getAverageEncoderTicks(self) -> float:
         """Gets the average distance of the TWO encoders."""
-        # self.sd.putValue("Left Encoder Value", self.leftTalon.getSelectedSensorPosition())
-        # self.sd.putValue("Right Encoder Value", self.rightTalon.getSelectedSensorPosition())
+       
         return self.leftTalon.getSelectedSensorPosition() * -1
 
     def setMaxOutput(self, maxOutput: float):
